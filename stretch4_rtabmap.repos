@@ -1,0 +1,37 @@
+# Sources stretch4_rtabmap builds on that are not in apt. From the workspace root:
+#
+#   vcs import src < src/stretch4_rtabmap/stretch4_rtabmap.repos
+#
+# GTSAM is pinned to the tested commit; the other upstream projects follow their latest master.
+# The forks carry Stretch patches on their stretch/* branches:
+#   rtabmap, rtabmap_ros  stretch/map-persistence  map updates survive Mem/ReduceGraph
+#   glim_ros2             stretch/flattened-tf     odom -> base_footprint projected onto the floor
+repositories:
+  gtsam:
+    type: git
+    url: https://github.com/borglab/gtsam.git
+    version: 3ad4b4c3cb28394c9597f48fa02dad361c8450e3
+  gtsam_points:
+    type: git
+    url: https://github.com/koide3/gtsam_points.git
+    version: master
+  iridescence:
+    type: git
+    url: https://github.com/koide3/iridescence.git
+    version: master
+  glim:
+    type: git
+    url: https://github.com/koide3/glim.git
+    version: master
+  glim_ros2:
+    type: git
+    url: https://github.com/hello-robot/glim_ros2.git
+    version: stretch/flattened-tf
+  rtabmap:
+    type: git
+    url: https://github.com/hello-robot/rtabmap.git
+    version: stretch/map-persistence
+  rtabmap_ros:
+    type: git
+    url: https://github.com/hello-robot/rtabmap_ros.git
+    version: stretch/map-persistence

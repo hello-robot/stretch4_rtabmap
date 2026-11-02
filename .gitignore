@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+
+# colcon / ament build artifacts
+build/
+install/
+log/
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+
+misc/
+imgui.ini

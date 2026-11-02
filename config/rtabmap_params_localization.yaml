@@ -1,0 +1,15 @@
+# RTAB-Map parameters for mode:=localization: rtabmap_params_mapping.yaml with wider ICP, so a
+# hand-placed 2D Pose Estimate converges.
+#
+#   ros2 launch stretch4_rtabmap navigation_mppi_glim_rtabmap.launch.py mode:=localization
+#
+# rtabmap_supervisor sets these keys to their rtabmap_params_mapping.yaml values when it switches
+# RTAB-Map to mapping, and back to these when it switches to localization. Every key here must
+# also be in rtabmap_params_mapping.yaml.
+
+inherit: rtabmap_params_mapping.yaml
+
+rtabmap_parameters:
+  Icp/MaxCorrespondenceDistance: 0.3   # converges from a hand-placed initial pose
+  Icp/MaxTranslation: 1.0              # default 0.2 rejects any larger correction outright
+  RGBD/LocalRadius: 10.0               # m around the robot searched for map nodes to match

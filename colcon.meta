@@ -1,0 +1,7 @@
+{
+  "names": {
+    "gtsam_points": {"dependencies": ["gtsam"]},
+    "glim": {"dependencies": ["gtsam", "gtsam_points", "iridescence"]},
+    "rtabmap": {"dependencies": ["gtsam"]}
+  }
+}

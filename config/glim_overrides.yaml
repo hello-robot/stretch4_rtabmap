@@ -1,0 +1,28 @@
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      transform_tolerance: 1.0
+      global_frame: odom # GLIM owns odom -> base_footprint.
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      transform_tolerance: 1.0
+planner_server:
+  ros__parameters:
+    GridBased:
+      allow_unknown: false
+
+behavior_server:
+  ros__parameters:
+    # GLIM's odometry frame; upstream is wheel_odom.
+    local_frame: odom
+
+collision_monitor:
+  ros__parameters:
+    odom_frame_id: "odom"
+    transform_tolerance: 1.0
+
+loopback_simulator:
+  ros__parameters:
+    odom_frame_id: "odom"

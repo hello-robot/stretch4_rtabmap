@@ -1,0 +1,37 @@
+# rtabmap_supervisor parameters. Loaded by navigation_mppi_glim_rtabmap.launch.py; pass
+# supervisor_params_file:=<your copy> to change them. manage_mode, enable_mapping and
+# trust_start_pose are set by the launch from mode, enable_mapping and initial_pose.
+
+rtabmap_supervisor:
+  ros__parameters:
+    map_frame: map
+    odom_frame: odom
+    base_frame: base_link
+
+    localized_after: 2           # accepted closures before LOCALIZED
+    lost_after_m: 3.0            # m of odometry without a closure before LOCALIZED drops to
+                                 # UNVERIFIED
+    lost_budget_m: 6.0           # m without a closure or pose before LOST (keeps driving in
+                                 # localization, map not written)
+    ## Lost while mapping
+    mapped_lost_updates: 10      # MAPPING turns LOST after this many updates in mapped space with no
+                                 # match to the old map
+    mapped_radius: 1.0           # m from an old map node counts as mapped space
+    graph_refresh: 60.0          # s between two looks at the old map's node poses (/rtabmap/mapGraph)
+    stale_after: 60.0            # s without an RTAB-Map update = NO_DATA.
+
+    ## Switching to mapping once localized.
+    mapping_after: 10.0          # s LOCALIZED before set_mode_mapping
+    mapping_after_max: 120.0     # s; mapping_after doubles after each LOST from mapping (a switch
+                                 # back to localization costs RTAB-Map ~35 s), reset by a link
+
+    ## Mapping only in the light, from the camera image's mean brightness (0-255).
+    # '' turns the check off.
+    image_topic: /cameras_head/stereo_masked/left/image_rect
+    dark_below: 40.0             # dark below this...
+    dark_after: 5.0              # ...for this many s: back to localization, no mapping
+    light_above: 70.0            # light above this...
+    light_after: 30.0            # ...for this many s: mapping may start again
+
+    # nav2 actions whose goals are cancelled in NO_DATA and NEED_POSE.
+    guarded_actions: ['/navigate_to_pose', '/navigate_through_poses']

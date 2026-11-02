@@ -1,0 +1,47 @@
+# mapped_navigator parameters. Loaded by launch/mapped_navigator.launch.py; copy and pass
+# params_file:=<your copy> to change them.
+
+mapped_navigator:
+  ros__parameters:
+    map_frame: map
+    odom_frame: odom
+    base_frame: base_link
+    status_topic: /localization_status   # rtabmap_supervisor's
+    wait_abort: 120.0            # s waiting for localization (NO_DATA, NEED_POSE) before a
+                                 # goal is aborted
+
+    ## Goals.
+    max_drive_attempts: 2        # nav2 failures with a valid plan before the goal is aborted
+    plan_retries: 2              # planner errors exploring cannot fix (TF, timeout, planner down)
+    # First no path of a goal: clear the whole global costmap (old scan marks; /map stays) and
+    # plan again before exploring.
+    clear_entirely_service: /global_costmap/clear_entirely_global_costmap
+    clear_wait: 2.0              # s before planning again; the global costmap updates at 1 Hz
+
+    ## START_OCCUPIED (the planner thinks the robot is in an obstacle)
+    get_cost_service: /global_costmap/get_cost_global_costmap
+    clear_around_service: /global_costmap/clear_around_global_costmap
+    scan_hits_blocked: 3         # scan points inside the footprint = something is really there
+    clear_around_distance: 1.5   # m window cleared (scan layers only; /map is never cleared)
+    max_unstuck_tries: 2         # step-outs per goal before aborting
+    unstuck_distance: 0.5        # m; farthest a step-out goes
+    # A step-out is a straight move through the collision monitor, heading kept.
+    step_speed: 0.1              # m/s
+    cmd_vel_topic: cmd_vel_nav   # the collision monitor's cmd_vel_in_topic
+    scan_topic: /scan_filtered   # the collision monitor's source
+    footprint_topic: /local_costmap/published_footprint   # its approach polygon
+    max_scan_age: 0.5            # s; no step on an older scan (the monitor ignores > 1.0 s)
+
+    ## No path, in MAPPING only: explore toward the goal (frontier search, then nearest
+    ## viewpoints).
+    explore_radius: 4.0          # m around the goal frontiers and viewpoints may be
+    robot_clearance: 0.25        # m from obstacles for a target; nav2 robot_radius is 0.19
+    min_frontier_size: 0.5       # m; shorter frontiers are ignored
+    potential_scale: 1.0         # frontier cost per m from the robot
+    gain_scale: 1.0              # frontier cost per m of frontier length (subtracted)
+    goal_scale: 2.0              # frontier cost per m from the goal; 0 ignores the goal
+    viewpoint_spacing: 0.75      # m between two targets
+    max_targets: 5               # targets driven to per goal before aborting
+    max_target_checks: 10        # candidates planned per pick
+    look_around: spin            # at a target: spin (nav2 Spin) or none
+    settle_time: 3.0             # s after looking around for /map to update

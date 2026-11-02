@@ -1,0 +1,99 @@
+# RTAB-Map parameters for mode:=slam, and the base for rtabmap_params_localization.yaml.
+#
+#   ros2 launch stretch4_rtabmap navigation_mppi_glim_rtabmap.launch.py mode:=slam
+#
+# NOT settable here -- owned by launch arguments so they stay consistent with other wiring:
+#   Kp/RoiRatios, Vis/RoiRatios       -> mast_roi_ratios
+#   Rtabmap/StartNewMapOnLoopClosure  -> require_loop_closure_before_mapping
+#   Mem/IncrementalMemory             -> mode:=slam | localization
+
+rtabmap_parameters:
+  # false anchors the map on the OLDEST node of the current component, so
+  # the origin is the first node of the first session.
+  RGBD/OptimizeFromGraphEnd: false
+  # Both must stay 0. Non-zero moves nodes out of working memory, and transferring nodes can change the map referential
+  Rtabmap/TimeThr: 0
+  Rtabmap/MemoryThr: 0
+  # Never start a new session on an odometry jump.
+  RGBD/NewMapOdomChangeDistance: 0
+
+  RGBD/OptimizeMaxErrorRepairRadius: 0.0  # 0 = off, RTAB-Map's default
+
+  # Load the whole saved graph into working memory so every mapped place is a loop-closure
+  # candidate from the first frame.
+  Mem/InitWMWithAllNodes: true
+
+  ## Database size
+  # Stops frame rejected for insufficient displacement from being written to disk
+  Mem/NotLinkedNodesKept: false
+  # On a loop closure, merge the new node into the old one instead of keeping both, so revisiting
+  # an area does not grow the graph.
+  Mem/ReduceGraph: true
+
+  # Both need the patched RTAB-Map in hello-robot
+  # Avoid writing a merged node to the database
+  Mem/ReduceGraphMergedKept: false
+  # The newest observation of a cell wins
+  Mem/ReduceGraphGridOwnership: true
+  # Save raw images and scans for the nodes that ARE in the graph.
+  Mem/BinDataKept: true
+  Mem/RawDescriptorsKept: true
+
+  ## Registration
+  Reg/Strategy: 2 # 0 = visual, 1 = ICP, 2 = visual + ICP
+  # 2D registration and optimization (x, y, yaw)
+  Reg/Force3DoF: true
+  Icp/PointToPlane: true
+  Icp/RangeMin: 0.5 # Same self-return radius GLIM filters at.
+  Icp/VoxelSize: 0.10                  # 0.05 overloads the CPU and delays the scans
+  Icp/MaxCorrespondenceDistance: 0.1   # raise to 0.2-0.3 if a coarse seed pose will not converge
+  Icp/CorrespondenceRatio: 0.1         # doubled for lidar submap matching (0.2), which good
+                                       # matches only just pass: raising it stops that matching
+  Icp/MaxTranslation: 0.2              # RTAB-Map's default; localization uses 1.0
+  Icp/Iterations: 30                   # first knob to cut if RTAB-Map's processing time exceeds the period
+
+  ## Occupancy grid -- Nav2's costmap
+  Grid/Sensor: 0                       # 0 = build from the lidar scan, not the camera
+  Grid/3D: false                       # Nav2's static layer wants 2D
+  # Normal-based ground segmentation is unreliable on sparse spinning-lidar sweeps; false selects a
+  # plain height passthrough
+  Grid/NormalsSegmentation: false
+  Grid/MinGroundHeight: -0.20
+  # The dominant accuracy knob. Height error of a far return grows as R*sin(tilt), so a small base
+  # tilt makes distant floor read as obstacle.
+  Grid/MaxGroundHeight: 0.20
+  Grid/MaxObstacleHeight: 1.40         # robot height
+  Grid/CellSize: 0.05                  # must match what Nav2 uses
+  Grid/RangeMin: 0.5                   # keeps the mast out of the grid
+  Grid/RangeMax: 4.5                   # Points beyond are skipped
+  Grid/RayTracing: true                # Clears a cell if a moved obstacle used to occupy
+  Grid/NoiseFilteringRadius: 0.12 # Outlier filter radius in METRES
+  Grid/NoiseFilteringMinNeighbors: 5
+  GridGlobal/ProbHit: 0.7             # Log-odds update per hit/miss: logodds(p) = ln(p / (1-p))
+  GridGlobal/ProbMiss: 0.4            # LOWER ProbMiss to clear faster
+  GridGlobal/Eroded: false            # erode obstacle cells if speckle survives filtering
+  # A fixed grid size. With 0 (the default) the grid grows by a cell whenever the map reaches a
+  # new edge
+  GridGlobal/MinSize: 50.0
+
+  ## Keyframe rate
+  Rtabmap/DetectionRate: 1.0
+  RGBD/LinearUpdate: 0.3 # Below this displacement the node is discarded.
+  RGBD/AngularUpdate: 0.3
+  Rtabmap/CreateIntermediateNodes: false    #True adds odometry-only nodes between keyframes
+
+  ## Loop closure while mapping
+  RGBD/OptimizeMaxError: 3.0 # Rejects a closure when the post-optimization error ratio exceeds this
+  RGBD/ProximityBySpace: true  # Matches scans against graph nodes near where you think you are.
+  RGBD/LocalRadius: 4.5                # localization uses 10.0
+  RGBD/ProximityPathMaxNeighbors: 5    # lidar match against a short submap where the camera finds no link
+  Rtabmap/LoopThr: 0.11   # Bag-of-words hypothesis threshold. Lower finds more closures and more false ones.
+  Vis/MinInliers: 20 # Raise to 25-30 if you get false closures in repetitive rooms
+  Optimizer/Robust: false # Bad closures are rejected after optimization, by RGBD/OptimizeMaxError
+
+  # Past odometry poses kept to validate a candidate correction against the recent trajectory
+  # instead of a single scan. Only used in localization.
+  RGBD/MaxOdomCacheSize: 20
+
+  ## Graph optimization when mapping on top of the loaded map
+  GTSAM/Incremental: false
