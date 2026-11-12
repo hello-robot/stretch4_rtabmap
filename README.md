@@ -179,6 +179,12 @@ ros2 topic echo /mapped_navigator/state           # what the navigator is doing
 ros2 run stretch4_rtabmap memory_monitor          # RAM use per process
 ```
 
+You can also inspect a saved database (nodes, loop closures, 3D map, etc.) with RTAB-Map's database viewer. By default RTAB-Map writes to `~/.ros/rtabmap.db`. If you set `database_path`, pass that path instead:
+
+```bash
+rtabmap-databaseViewer ~/.ros/rtabmap.db
+```
+
 Settings live in `config/`: `rtabmap_params_*.yaml` (RTAB-Map), `rtabmap_supervisor.yaml`
 (localization status), `mapped_navigator.yaml` (navigator) and `glim_overrides.yaml` (Nav2
 changes for GLIM).
