@@ -69,7 +69,11 @@ def launch_setup(context):
                   for name in ('mapping', 'localization')}
     own_params_file = LaunchConfiguration('rtabmap_params_file').perform(context)
 
-    actions = [_launch(
+    actions = [
+        SetLaunchConfiguration('sigterm_timeout', '120'),
+        SetLaunchConfiguration('sigkill_timeout', '30'),
+    ]
+    actions.append(_launch(
         'rtabmap_glim.launch.py',
         localization='true' if mode == 'localization' else 'false',
         rtabmap_params_file=own_params_file or mode_files[
@@ -83,7 +87,7 @@ def launch_setup(context):
         rtabmap_viz=LaunchConfiguration('rtabmap_viz'),
         rviz='false',
         delete_db_on_start='true',  # rtabmap_glim ignores it in localization
-    )]
+    ))
 
     if _is_true(context, 'start_supervisor'):
         actions.append(Node(
