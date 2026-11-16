@@ -18,7 +18,7 @@ sudo apt install python3-vcstool
 cd $WORKSPACE/src
 git clone https://github.com/hello-robot/stretch4_rtabmap.git
 cd $WORKSPACE
-vcs import src < src/stretch4_rtabmap/stretch4_rtabmap.repos
+vcs import --recursive src < src/stretch4_rtabmap/stretch4_rtabmap.repos
 ```
 
 **2. Install the dependencies:**
