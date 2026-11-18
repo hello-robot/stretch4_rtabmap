@@ -89,6 +89,8 @@ rtabmap_parameters:
   RGBD/ProximityPathMaxNeighbors: 5    # lidar match against a short submap where the camera finds no link
   Rtabmap/LoopThr: 0.11   # Bag-of-words hypothesis threshold. Lower finds more closures and more false ones.
   Vis/MinInliers: 20 # Raise to 25-30 if you get false closures in repetitive rooms
+  Vis/MaxDepth: 5.0 # m; far stereo points are noisy
+  Kp/MaxDepth: 6.0  # m; same for loop-closure words
   Optimizer/Robust: false # Bad closures are rejected after optimization, by RGBD/OptimizeMaxError
 
   # Past odometry poses kept to validate a candidate correction against the recent trajectory

@@ -52,7 +52,6 @@ def _launch_setup(context):
         name='robot_self_mask',
         output='screen',
         parameters=[{
-            'max_rate': float(value('max_rate')),
             'fill_mode': value('fill_mode'),
             'apply_mask': value('apply_mask') == 'true',
             'debug': True,
@@ -98,9 +97,6 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'apply_mask', default_value='true', choices=['true', 'false'],
             description='false: show the images unmasked, with the features RTAB-Map would get.'),
-        DeclareLaunchArgument(
-            'max_rate', default_value='5.0',
-            description='Higher than in rtabmap_glim (2 Hz) so the preview feels live.'),
         DeclareLaunchArgument('padding', default_value='0.03'),
         DeclareLaunchArgument('left_static_mask', default_value=''),
         DeclareLaunchArgument('right_static_mask', default_value=''),

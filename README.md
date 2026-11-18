@@ -18,7 +18,7 @@ sudo apt install python3-vcstool
 cd $WORKSPACE/src
 git clone https://github.com/hello-robot/stretch4_rtabmap.git
 cd $WORKSPACE
-vcs import src < src/stretch4_rtabmap/stretch4_rtabmap.repos
+vcs import --recursive src < src/stretch4_rtabmap/stretch4_rtabmap.repos
 ```
 
 **2. Install the dependencies:**
@@ -177,6 +177,12 @@ Arguments of the three part files can be given to the main launch too. The commo
 ros2 run stretch4_rtabmap rtabmap_loop_monitor    # what RTAB-Map is doing, step by step
 ros2 topic echo /mapped_navigator/state           # what the navigator is doing
 ros2 run stretch4_rtabmap memory_monitor          # RAM use per process
+```
+
+You can also inspect a saved database (nodes, loop closures, 3D map, etc.) with RTAB-Map's database viewer. By default RTAB-Map writes to `~/.ros/rtabmap.db`. If you set `database_path`, pass that path instead:
+
+```bash
+rtabmap-databaseViewer ~/.ros/rtabmap.db
 ```
 
 Settings live in `config/`: `rtabmap_params_*.yaml` (RTAB-Map), `rtabmap_supervisor.yaml`

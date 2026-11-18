@@ -328,7 +328,6 @@ class RobotSelfMask(Node):
         # The cameras are inside head_link's box, so it cannot be projected.
         self.declare_parameter('exclude_links', ['head_link'])
         self.declare_parameter('padding', 0.03)
-        self.declare_parameter('max_rate', 2.0)
         self.declare_parameter('fill_mode', 'blur')
         self.declare_parameter('apply_mask', True)
         self.declare_parameter('debug', False)
@@ -358,10 +357,10 @@ class RobotSelfMask(Node):
                 self.static_masks[side] = mask > 0
 
         self.urdf_xml = None
-        self.last_stamp = None          # stamp of the last pair processed or attempted
         self.last_output = time.monotonic()
         self.last_input = None
         self.last_drop = ''
+        self.tf_drops = 0               # frames dropped in a row for missing TF
         self.joints = {}                # latest position of every joint on /joint_states
         self.moving_joints = set()      # the ones that change the mask, from the URDF
         self.cache = None               # {side: (mask, alpha)} for cache_joints
@@ -420,8 +419,6 @@ class RobotSelfMask(Node):
 
     def load_settings(self):
         value = lambda name: self.get_parameter(name).value  # noqa: E731
-        rate = value('max_rate')
-        self.min_period = Duration(seconds=1.0 / rate) if rate > 0.0 else Duration()
         self.fill_mode = value('fill_mode')
         self.apply_mask = bool(value('apply_mask'))
         self.fill_value = int(value('fill_value'))
@@ -498,8 +495,10 @@ class RobotSelfMask(Node):
                 tf = self.lookup(camera_frame, link, stamp, timeout)
             except TransformException as e:
                 self.last_drop = f'no TF {link} -> {camera_frame}: {e}'
-                self.get_logger().warn(f'Dropping frame, {self.last_drop}',
-                                       throttle_duration_sec=5.0)
+                self.tf_drops += 1
+                self.get_logger().warn(
+                    f'Dropping frames for missing TF ({self.tf_drops} so far), {self.last_drop}',
+                    throttle_duration_sec=5.0)
                 return None
             timeout = Duration()
             matrix = transform_matrix(tf)
@@ -513,6 +512,9 @@ class RobotSelfMask(Node):
                         'exclude_links.')
                 continue
             result[link] = corners @ matrix[:3, :3].T + matrix[:3, 3]
+        if self.tf_drops:
+            self.get_logger().info(f'TF back after {self.tf_drops} dropped frames.')
+            self.tf_drops = 0
         return result
 
     def rebuild_mask(self, left_msg, right_msg, stamp, joints):
@@ -549,10 +551,6 @@ class RobotSelfMask(Node):
             return
         self.last_input = time.monotonic()
         stamp = Time.from_msg(left_msg.header.stamp)
-        if self.last_stamp is not None and stamp - self.last_stamp < self.min_period:
-            return
-        # Counts failed attempts too, so a TF problem is retried at max_rate, not on every frame.
-        self.last_stamp = stamp
 
         shape = (left_msg.width, left_msg.height, right_msg.width, right_msg.height)
         joints = dict(self.joints)

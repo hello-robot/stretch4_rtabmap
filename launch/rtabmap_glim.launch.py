@@ -165,7 +165,6 @@ def _launch_setup(context):
             respawn=True,
             respawn_delay=2.0,
             parameters=[{
-                'max_rate': float(LaunchConfiguration('mask_max_rate').perform(context)),
                 'padding': float(LaunchConfiguration('mask_padding').perform(context)),
                 'fill_mode': LaunchConfiguration('mask_fill_mode').perform(context),
                 'left_static_mask': LaunchConfiguration('mask_left_static').perform(context),
@@ -260,9 +259,6 @@ def generate_launch_description():
             'mask_robot', default_value='true', choices=['true', 'false'],
             description="Paint the robot's own links out of the stereo images using the URDF "
                         'and TF, so features never match on the arm.'),
-        DeclareLaunchArgument(
-            'mask_max_rate', default_value='2.0',
-            description='Max rate (Hz) of the masked images; RTAB-Map only uses 1 Hz.'),
         DeclareLaunchArgument(
             'mask_fill_mode', default_value='blur', choices=['constant', 'blur', 'inpaint'],
             description="How the robot's pixels are painted: constant (black), blur, or inpaint "

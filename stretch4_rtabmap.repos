@@ -1,6 +1,8 @@
 # Sources stretch4_rtabmap builds on that are not in apt. From the workspace root:
 #
-#   vcs import src < src/stretch4_rtabmap/stretch4_rtabmap.repos
+#   vcs import --recursive src < src/stretch4_rtabmap/stretch4_rtabmap.repos
+#
+# --recursive is required: iridescence vendors its dependencies as git submodules.
 #
 # GTSAM is pinned to the tested commit; the other upstream projects follow their latest master.
 # The forks carry Stretch patches on their stretch/* branches:

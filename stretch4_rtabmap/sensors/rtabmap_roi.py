@@ -10,8 +10,8 @@ fraction of each edge that is CROPPED AWAY before feature extraction.
 EDGE_NAMES = ('left', 'right', 'top', 'bottom')
 
 # RoiRatios can only crop full-width/full-height edge strips.
-MAST_ROI_RATIOS = '0.0 0.0 0.0 0.09'
-
+# No crop: the pitched-up stereo view (stretch_core stereo_pitch_deg) no longer sees the base.
+MAST_ROI_RATIOS = '0.0 0.0 0.0 0.0'
 
 def parse_roi_ratios(value):
     """Parse a RoiRatios string, returning None if RTAB-Map would reject it."""

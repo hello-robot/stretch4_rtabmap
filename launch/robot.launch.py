@@ -38,6 +38,7 @@ def generate_launch_description():
             PathJoinSubstitution([stretch_core_launch, 'luxonis.launch.py']),
             launch_arguments={
                 'use_rviz': 'false', 'fps': '10', 'use_stereo': 'true',
+                'stereo_max_rate': '2.0',  # 2x RTAB-Map's 1 Hz detection rate
                 'use_center': LaunchConfiguration('use_center_camera'),
             }.items()),
         IncludeLaunchDescription(
